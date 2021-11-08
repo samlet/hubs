@@ -1,2 +1,15 @@
 server:
     port: 9002
+
+spring:
+    cloud:
+        stream:
+            function:
+                definition: sagasEvent
+            bindings:
+                sagasEvent-in-0:
+                    destination: sagasEvent
+            kafka:
+                binder:
+                    brokers: localhost:9092
+                    auto-create-topics: true

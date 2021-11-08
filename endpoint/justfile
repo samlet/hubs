@@ -1,3 +1,7 @@
 run:
 	mvn spring-boot:run
+start:
+	mvn package
+	java -jar target/endpoint-1.0-SNAPSHOT.jar
+
 

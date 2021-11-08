@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Configuration
@@ -37,7 +38,7 @@ public class OfbizConnector {
 
     /*
     $ curl -H "Content-Type: text/plain" -X POST -d "hello from the other side" http://localhost:9002
-    $ kafka-console-consumer --bootstrap-server localhost:9092 --topic toStream-out-0 --from-beginning
+    $ kafka-console-consumer --bootstrap-server localhost:9092 --topic sagas --from-beginning
      */
     @RequestMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -45,4 +46,5 @@ public class OfbizConnector {
         System.out.println("Sending " + body);
         streamBridge.send("sagas", body);
     }
+
 }
