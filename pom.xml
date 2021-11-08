@@ -12,6 +12,7 @@
     <modules>
         <module>pipeline</module>
         <module>common</module>
+        <module>endpoint</module>
     </modules>
     <groupId>com.bluecc</groupId>
     <artifactId>hubs</artifactId>
