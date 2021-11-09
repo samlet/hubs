@@ -13,6 +13,7 @@
         <module>pipeline</module>
         <module>common</module>
         <module>endpoint</module>
+        <module>prefabs</module>
     </modules>
     <groupId>com.bluecc</groupId>
     <artifactId>hubs</artifactId>
@@ -113,11 +114,11 @@
             <artifactId>jackson-core</artifactId>
         </dependency>
 
-        <!--		<dependency>-->
-        <!--			<groupId>com.h2database</groupId>-->
-        <!--			<artifactId>h2</artifactId>-->
-        <!--			<scope>runtime</scope>-->
-        <!--		</dependency>-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- common -->
         <dependency>
