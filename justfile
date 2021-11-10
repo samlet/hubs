@@ -9,3 +9,7 @@ start app:
 clean:
     mvn clean install -U
 
+# $ just secas inventory
+secas keyword:
+	python -m sagas.ofbiz.secas all_secas | grep -i {{keyword}} | xargs -I {} python -m sagas.ofbiz.secas get_secas {}
+
