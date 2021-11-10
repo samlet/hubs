@@ -1,0 +1,13 @@
+i18n:
+  updatePurchaseShipmentFromReceipt: |
+    每当生成 ShipmentReceipt 时，检查与其关联的 Shipment 以查看是否已收到所有项目。
+    如果是，请将其状态更改为 PURCH_SHIP_RECEIVED。
+    检查是通过计算发货的产品（来自 ShipmentAndItem）并将它们与收到的产品
+    （来自 ShipmentReceipt）进行匹配来完成的。
+
+  checkCreateStockRequirementAtp: |
+    根据 ATP 库存创建产品需求.
+    ATP 库存: 既可承诺库存, 产品库存状况的一种, 指有足够的库存并能够马上发货的订单执行能力。
+    制订该计划时,应基于逐期数据确定安全库存、
+    生产需求和最终未承诺库存, 既可承诺库存(Available-to-promise, ATP inventory)。
+

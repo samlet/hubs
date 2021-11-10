@@ -14,50 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bluecc.prefabs.fixtures.sendtask;
+package com.bluecc.prefabs.fixtures;
 
-import com.bluecc.prefabs.fixtures.ReaderTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.bluecc.prefabs.fixtures.ReaderTest.dataSource;
-import static com.bluecc.prefabs.fixtures.ReaderTest.deployTests;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
- * @author Kristin Polenz
+ * Simple process test to validate the current implementation protoype.
  */
-public class SendTaskTest {
+public class TaskAssigneeTest {
 
-    // @Deployment
     @Test
-    public void testJavaDelegate() throws IOException {
-        ProcessEngine camunda =
-                new StandaloneInMemProcessEngineConfiguration()
-                        .buildProcessEngine();
-        ReaderTest.ProcessHelper helper = new ReaderTest.ProcessHelper(camunda);
-        deployTests(camunda);
-
-        // ....
-
-        DummySendTask.wasExecuted = false;
-        ProcessInstance processInstance = helper.runtimeService
-                .startProcessInstanceByKey("sendTaskJavaDelegate");
-
-        helper.assertProcessEnded(processInstance.getId());
-        assertTrue(DummySendTask.wasExecuted);
-    }
-
-    // @Deployment
-    @Test
-    public void testActivityName() throws IOException {
+    public void testTaskAssignee() throws IOException {
         // engine
         ProcessEngine camunda =
                 new StandaloneInMemProcessEngineConfiguration()
@@ -65,28 +45,33 @@ public class SendTaskTest {
         ReaderTest.ProcessHelper helper = new ReaderTest.ProcessHelper(camunda);
 
         // deploy
+        // BpmnModelInstance modelInstance = Bpmn.readModelFromStream(
+        //         dataSource("TaskAssigneeTest.testTaskAssignee.bpmn20.xml"));
+        // TaskAssigneeTest.xml
         BpmnModelInstance modelInstance = Bpmn.readModelFromStream(
-                dataSource("SendTaskTest.testActivityName.bpmn20.xml"));
+                TaskAssigneeTest.class.getResourceAsStream("/bpmn/TaskAssigneeTest.testTaskAssignee.bpmn20.xml"));
         camunda.getRepositoryService().createDeployment() //
-                .addModelInstance("process.bpmn", modelInstance) //
+                .addModelInstance("taskAssigneeExampleProcess.bpmn", modelInstance) //
                 .deploy();
 
-        DummyActivityBehavior.wasExecuted = false;
-
+        // Start process instance
         ProcessInstance processInstance = helper.runtimeService
-                .startProcessInstanceByKey("process");
+                .startProcessInstanceByKey("taskAssigneeExampleProcess");
 
-        helper.runtimeService.signal(processInstance.getId());
+        // Get task list
+        List<Task> tasks = helper.taskService
+                .createTaskQuery()
+                .taskAssignee("kermit")
+                .list();
+        assertEquals(1, tasks.size());
+        Task myTask = tasks.get(0);
+        assertEquals("Schedule meeting", myTask.getName());
+        assertEquals("Schedule an engineering meeting for next week with the new hire.", myTask.getDescription());
 
+        // Complete task. Process is now finished
+        helper.taskService.complete(myTask.getId());
+        // assert if the process instance completed
         helper.assertProcessEnded(processInstance.getId());
-
-        assertTrue(DummyActivityBehavior.wasExecuted);
-
-        assertNotNull(DummyActivityBehavior.currentActivityName);
-        assertEquals("Task", DummyActivityBehavior.currentActivityName);
-
-        assertNotNull(DummyActivityBehavior.currentActivityId);
-        assertEquals("task", DummyActivityBehavior.currentActivityId);
     }
 
 }

@@ -4,6 +4,7 @@ import com.google.common.io.Resources;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -28,7 +29,7 @@ public class ReaderTest {
     // protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule();
     // protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
-    static InputStream dataSource(String src) throws IOException {
+    public static InputStream dataSource(String src) throws IOException {
         return Resources.getResource("bpmn/" + src).openStream();
     }
 
@@ -36,10 +37,13 @@ public class ReaderTest {
         public RuntimeService runtimeService;
         public ProcessEngine processEngine;
         ManagementService managementService;
+        public TaskService taskService;
+
         public ProcessHelper(ProcessEngine camunda){
             this.processEngine=camunda;
             this.runtimeService=camunda.getRuntimeService();
             managementService = camunda.getManagementService();
+            taskService = processEngine.getTaskService();
         }
 
         private List<EventSubscription> getEventSubscriptionList() {
