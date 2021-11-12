@@ -31,7 +31,7 @@ public class SimpleTask extends BuilderBase {
 
         // - flow of activities and compensating actions
         flow.startEvent()
-                .serviceTask("car").name("Reserve car").camundaClass(ReserveCarAdapter.class)
+                .serviceTask("car").name("Reserve car").camundaClass(ReserveNotifyAdapter.class)
                 .serviceTask("hotel").name("Book hotel").camundaClass(BookHotelAdapter.class)
                 .endEvent();
 
