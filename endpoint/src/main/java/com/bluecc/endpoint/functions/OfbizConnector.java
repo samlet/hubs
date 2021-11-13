@@ -65,7 +65,7 @@ public class OfbizConnector {
         });
         System.out.println("Sending " + body);
         // streamBridge.send("sagas", body);
-        streamBridge.send("sagas",
+        streamBridge.send("bluecc-in",
                 MessageBuilder.withPayload(body)
                         .setHeader("type", contentType)
                         .setHeader("fn", headers.getFirst("fn"))
