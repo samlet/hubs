@@ -17,3 +17,8 @@ all_services:
 service name:
 	python -m sagas.ofbiz.tools service_model {{name}}
 
+c-prefabs:
+	mvn compile -f prefabs/pom.xml
+inst:
+	mvn install -DskipTests -f common/pom.xml 
+

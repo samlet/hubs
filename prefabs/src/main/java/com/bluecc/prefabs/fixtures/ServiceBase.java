@@ -5,9 +5,9 @@ import com.google.gson.Gson;
 
 public class ServiceBase {
     static Gson gson = new Gson();
-    protected <T> void sendImpl(ServiceCaller.CallContext ctx, Receiver.ReceiveCallback callback,
+    protected <T> String sendImpl(ServiceCaller.CallContext ctx, Receiver.ReceiveCallback callback,
                             ServiceCaller.ServiceEnvelope<T> msg) {
-        byte[] callid= ctx.getSender().send(gson.toJson(msg));
+        String callid= ctx.getSender().send(gson.toJson(msg));
         ctx.getReceiver().register(callid, rec -> {
             callback.proc(rec);
             int count=ctx.getTaskCount().decrementAndGet();
@@ -16,5 +16,6 @@ public class ServiceBase {
             }
         });
         ctx.getTaskCount().getAndIncrement();
+        return callid;
     }
 }

@@ -36,12 +36,13 @@ public class Sender {
         this.isAsync = isAsync;
     }
 
-    public byte[] send(String messageStr) {
+    public String send(String messageStr) {
         long messageNumber = messageNo.getAndIncrement();
         long startTime = System.currentTimeMillis();
         ProducerRecord<String, String> rec = new ProducerRecord<>(topic,
                 Long.toString(messageNumber), messageStr);
-        byte[] callid=UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8);
+        String calluid=UUID.randomUUID().toString();
+        byte[] callid=calluid.getBytes(StandardCharsets.UTF_8);
         rec.headers().add("serial", Long.toString(messageNumber).getBytes(StandardCharsets.UTF_8))
                 .add("type", "application/json".getBytes(StandardCharsets.UTF_8))
                 .add("fn", "service".getBytes(StandardCharsets.UTF_8))
@@ -60,7 +61,7 @@ public class Sender {
             }
         }
 
-        return callid;
+        return calluid;
     }
 }
 

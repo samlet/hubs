@@ -24,10 +24,10 @@ public class Receiver {
         this.topics= Arrays.asList(topics);
     }
 
-    public void register(byte[] callid, ReceiveCallback callback){
-        String key=new String(callid, StandardCharsets.UTF_8);
-        System.out.println("register callback for: "+key);
-        this.callbacks.put(key, callback);
+    public void register(String callid, ReceiveCallback callback){
+        // String key=new String(callid, StandardCharsets.UTF_8);
+        System.out.println("register callback for: "+callid);
+        this.callbacks.put(callid, callback);
     }
 
     public Thread listen() {

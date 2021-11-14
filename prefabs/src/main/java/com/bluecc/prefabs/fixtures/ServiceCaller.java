@@ -4,10 +4,7 @@ import com.bluecc.prefabs.kafka.Receiver;
 import com.bluecc.prefabs.kafka.Sender;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import lombok.*;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -26,33 +23,6 @@ public class ServiceCaller {
     public static class ServiceEnvelope<T> {
         String serviceName;
         T serviceInParams;
-    }
-
-    @Data
-    @Builder
-    public static class TestScvParams {
-        String message;
-        double defaultValue;
-    }
-
-    @Data
-    public static class TestScvResult {
-        String resp;
-    }
-
-    @Data
-    @Builder
-    static class TestScv extends ServiceBase{
-        TestScvParams params;
-
-        public void send(CallContext ctx, Receiver.ReceiveCallback callback) {
-            ServiceEnvelope<TestScvParams> msg = ServiceEnvelope.<TestScvParams>builder()
-                    .serviceName("testScv")
-                    .serviceInParams(params)
-                    .build();
-
-            sendImpl(ctx, callback, msg);
-        }
     }
 
     @Data
@@ -85,6 +55,35 @@ public class ServiceCaller {
         return ctx;
     }
 
+    /// testScv
+
+    @Data
+    @Builder
+    public static class TestScvParams {
+        String message;
+        double defaultValue;
+    }
+
+    @Data
+    public static class TestScvResult {
+        String resp;
+    }
+
+    @Data
+    @Builder
+    @EqualsAndHashCode(callSuper = true)
+    static class TestScv extends ServiceBase{
+        TestScvParams params;
+
+        public String send(CallContext ctx, Receiver.ReceiveCallback callback) {
+            ServiceEnvelope<TestScvParams> msg = ServiceEnvelope.<TestScvParams>builder()
+                    .serviceName("testScv")
+                    .serviceInParams(params)
+                    .build();
+
+            return sendImpl(ctx, callback, msg);
+        }
+    }
 
     public static void main(String[] args) throws InterruptedException {
         CallContext ctx = prepare(()-> System.exit(0));
@@ -97,7 +96,6 @@ public class ServiceCaller {
                 .build()
                 .send(ctx, record -> {
                     System.out.println(".. response: "+record.value());
-                    // System.exit(0);  // stop
                 });
 
         System.out.println(".. wait response");
