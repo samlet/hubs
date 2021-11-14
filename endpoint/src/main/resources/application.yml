@@ -8,7 +8,7 @@ spring:
                 definition: sagasEvent
             bindings:
                 sagasEvent-in-0:
-                    destination: sagasEvent
+                    destination: bluecc-out
             kafka:
                 binder:
                     brokers: localhost:9092

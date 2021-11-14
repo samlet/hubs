@@ -11,6 +11,7 @@ import lombok.Singular;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServiceCaller {
     @Data
@@ -41,7 +42,7 @@ public class ServiceCaller {
 
     @Data
     @Builder
-    static class TestScv {
+    static class TestScv extends ServiceBase{
         TestScvParams params;
 
         public void send(CallContext ctx, Receiver.ReceiveCallback callback) {
@@ -50,22 +51,26 @@ public class ServiceCaller {
                     .serviceInParams(params)
                     .build();
 
-            byte[] callid=ctx.getSender().send(gson.toJson(msg));
-            ctx.getReceiver().register(callid, callback);
+            sendImpl(ctx, callback, msg);
         }
     }
 
     @Data
-    @AllArgsConstructor
     public static class CallContext{
+        AtomicInteger taskCount = new AtomicInteger(0);
         InstanceConf conf;
         Sender sender;
         Receiver receiver;
+        Runnable endProc;
+
+        public CallContext(InstanceConf conf, Sender sender, Receiver receiver) {
+            this.conf = conf;
+            this.sender = sender;
+            this.receiver = receiver;
+        }
     }
 
-    static Gson gson = new Gson();
-
-    public static CallContext prepare() throws InterruptedException {
+    public static CallContext prepare(Runnable endProc) throws InterruptedException {
         InstanceConf conf = InstanceConf.builder()
                 .inTopic("bluecc-in")
                 .outTopic("bluecc-out")
@@ -74,6 +79,7 @@ public class ServiceCaller {
         receiver.listen();
         Sender sender = new Sender(conf.inTopic, false);
         CallContext ctx=new CallContext(conf, sender, receiver);
+        ctx.setEndProc(endProc);
 
         Thread.sleep(500);
         return ctx;
@@ -81,7 +87,7 @@ public class ServiceCaller {
 
 
     public static void main(String[] args) throws InterruptedException {
-        CallContext ctx = prepare();
+        CallContext ctx = prepare(()-> System.exit(0));
 
         TestScv.builder()
                 .params(TestScvParams.builder()
@@ -91,7 +97,7 @@ public class ServiceCaller {
                 .build()
                 .send(ctx, record -> {
                     System.out.println(".. response: "+record.value());
-                    System.exit(0);  // stop
+                    // System.exit(0);  // stop
                 });
 
         System.out.println(".. wait response");

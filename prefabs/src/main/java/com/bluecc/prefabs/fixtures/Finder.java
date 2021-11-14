@@ -9,7 +9,6 @@ import lombok.Singular;
 
 import java.util.Map;
 
-import static com.bluecc.prefabs.fixtures.ServiceCaller.gson;
 import static com.bluecc.prefabs.fixtures.ServiceCaller.prepare;
 
 public class Finder {
@@ -26,7 +25,7 @@ public class Finder {
 
     @Data
     @Builder
-    static class PerformFindList {
+    static class PerformFindList extends ServiceBase{
         PerformFindListParams params;
 
         public void send(CallContext ctx, Receiver.ReceiveCallback callback) {
@@ -35,13 +34,12 @@ public class Finder {
                     .serviceInParams(params)
                     .build();
 
-            byte[] callid=ctx.getSender().send(gson.toJson(msg));
-            ctx.getReceiver().register(callid, callback);
+            sendImpl(ctx, callback, msg);
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        CallContext ctx = prepare();
+        CallContext ctx = prepare(()-> System.exit(0));
 
         String orderId="WSCO10112";
 
@@ -55,7 +53,19 @@ public class Finder {
                 .build()
                 .send(ctx, record -> {
                     System.out.println(".. response: "+record.value());
-                    System.exit(0);  // stop
+                });
+
+        // OrderAndContactMech
+        PerformFindList.builder()
+                .params(PerformFindListParams.builder()
+                        .entityName("OrderAndContactMech")
+                        .viewIndex(0)
+                        .viewSize(5)
+                        .inputField("orderId", orderId)
+                        .build())
+                .build()
+                .send(ctx, record -> {
+                    System.out.println(".. response: "+record.value());
                 });
 
         System.out.println(".. wait response");
